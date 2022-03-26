@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task } from './tasks.interface';
+import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
 
 @Injectable()
 export class TasksService {
   private tasks: Task[] = [];
   private autoNumber = 1;
 
-  create(data: Task) {
+  create(data: CreateTaskDto) {
     const newData = { ...data, id: this.autoNumber };
     this.tasks.push(newData);
     this.autoNumber = this.autoNumber + 1;
@@ -26,7 +27,7 @@ export class TasksService {
     }
   }
 
-  update(taskId: number, data: Task) {
+  update(taskId: number, data: UpdateTaskDto) {
     const index = this.tasks.findIndex((task) => task.id === taskId);
     if (index >= 0) {
       const task = this.tasks[index];
