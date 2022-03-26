@@ -1,45 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task } from './tasks.interface';
 import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Task } from 'src/entities/task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
-  private autoNumber = 1;
+  constructor(
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+  ) {}
 
-  create(data: CreateTaskDto) {
-    const newData = { ...data, id: this.autoNumber };
-    this.tasks.push(newData);
-    this.autoNumber = this.autoNumber + 1;
-    return newData;
+  async create(data: CreateTaskDto) {
+    const newItem = this.taskRepository.create(data);
+    return this.taskRepository.save(newItem);
   }
 
-  find() {
-    return { data: this.tasks, count: this.tasks.length };
+  async find() {
+    const [data, count] = await this.taskRepository.findAndCount({
+      order: { createdAt: 'ASC' },
+    });
+    return { data, count };
   }
 
-  findById(taskId: number) {
-    const task = this.tasks.find((task) => task.id === taskId);
-    if (task) {
-      return task;
-    } else {
+  async findById(taskId: string) {
+    return this.taskRepository.findOneOrFail(taskId).catch(() => {
       throw new NotFoundException('Task is not found');
-    }
+    });
   }
 
-  update(taskId: number, data: UpdateTaskDto) {
-    const index = this.tasks.findIndex((task) => task.id === taskId);
-    if (index >= 0) {
-      const task = this.tasks[index];
-      const newTask = { ...task, ...data };
-      this.tasks = [
-        ...this.tasks.slice(0, index),
-        newTask,
-        ...this.tasks.slice(index, -1),
-      ];
-      return newTask;
-    } else {
+  async update(taskId: string, data: UpdateTaskDto) {
+    const item = await this.taskRepository.findOneOrFail(taskId).catch(() => {
       throw new NotFoundException('Task is not found');
-    }
+    });
+    return this.taskRepository.save({ ...item, ...data });
   }
 }

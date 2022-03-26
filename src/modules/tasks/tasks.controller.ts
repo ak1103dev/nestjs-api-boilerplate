@@ -1,20 +1,9 @@
-import {
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { ApiOkResponse, ApiNotFoundResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, UpdateTaskDto, Task } from './tasks.dto';
+import { CreateTaskDto, UpdateTaskDto, FindTaskResponse } from './tasks.dto';
 import { ExceptionResponse } from 'src/utils/error.dto';
+import { Task } from 'src/entities/task.entity';
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -22,31 +11,28 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Post()
-  @ApiCreatedResponse({ type: Task })
+  @ApiOkResponse({ type: Task })
   create(@Body() data: CreateTaskDto) {
     return this.tasksService.create(data);
   }
 
   @Get()
-  @ApiCreatedResponse({ type: [Task] })
+  @ApiOkResponse({ type: FindTaskResponse })
   find() {
     return this.tasksService.find();
   }
 
   @Get(':id')
-  @ApiCreatedResponse({ type: Task })
+  @ApiOkResponse({ type: Task })
   @ApiNotFoundResponse({ type: ExceptionResponse })
-  findById(@Param('id', ParseIntPipe) taskId: number) {
+  findById(@Param('id') taskId: string) {
     return this.tasksService.findById(taskId);
   }
 
   @Patch(':id')
-  @ApiCreatedResponse({ type: Task })
+  @ApiOkResponse({ type: Task })
   @ApiNotFoundResponse({ type: ExceptionResponse })
-  async update(
-    @Param('id', ParseIntPipe) taskId: number,
-    @Body() data: UpdateTaskDto,
-  ) {
+  async update(@Param('id') taskId: string, @Body() data: UpdateTaskDto) {
     return this.tasksService.update(taskId, data);
   }
 }
