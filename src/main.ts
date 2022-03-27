@@ -12,6 +12,7 @@ async function bootstrap() {
     }),
   );
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('API Document')
     .setDescription('Description')
     .setVersion('1.0')
