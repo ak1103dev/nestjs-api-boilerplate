@@ -32,7 +32,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('login failed');
     }
-    const payload = { userId: user.id };
+    const payload = { userId: user.id, roles: user.roles };
     return {
       accessToken: this.jwtService.sign(payload),
     };

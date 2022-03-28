@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/enums/role.enum';
 import {
   Entity,
   Column,
@@ -24,6 +25,10 @@ export class User {
   @ApiProperty()
   @Column({ select: false })
   password: string;
+
+  @ApiProperty()
+  @Column({ type: 'simple-array' })
+  roles: Role[];
 
   @ApiProperty({ readOnly: true })
   @CreateDateColumn({ type: 'datetime' })
