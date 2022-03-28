@@ -13,6 +13,9 @@ import { CreateUserDto, FindUserResponse } from './users.dto';
 import { User } from 'src/entities/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { LoginDto } from '../auth/auth.dto';
+import { Roles } from 'src/authorization/roles.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/authorization/roles.guard';
 
 @ApiBearerAuth()
 @ApiTags('users')
@@ -30,6 +33,9 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(RolesGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: FindUserResponse })
   async findUser() {
     return this.usersService.find();
